@@ -60,12 +60,12 @@ function [Path_clock, Path_counter_clock, flra] = torres16(V, dx)
     PeR = PeR';
 
     % clock wise path
-    [PathRotated, ~] = getPathMR([PsR PeR], dx, 1);
+    [PathRotated] = getPathMR([PsR PeR], dx, 1);
     Path_clock = rotatePolygon(PathRotated, alpha);
     Path_clock = Path_clock';
     
     % counter clock wise path
-    [PathRotated, ~] = getPathMR([PsR PeR], dx, -1);
+    [PathRotated] = getPathMR([PsR PeR], dx, -1);
     Path_counter_clock = rotatePolygon(PathRotated, alpha);
     Path_counter_clock = Path_counter_clock';
 end

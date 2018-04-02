@@ -104,7 +104,7 @@ for i=1:m
         best_antipodal_pair = i;
     end
         
-    %--------- Draw the best path for an antipodal pair
+%--------- Draw the best path for an antipodal pair
 %     figure;
 %     axis equal;
 %     line([M(:,1)';Mshifted(:,1)'],[M(:,2)';Mshifted(:,2)'],'Color','k');
@@ -122,7 +122,6 @@ end
 
 tiempo_vasq = toc
 
-
 figure('Position',[10+500 100 500 500]);
 axis equal;
 line([M(:,1)';Mshifted(:,1)'],[M(:,2)';Mshifted(:,2)'],'Color','k');
@@ -137,7 +136,7 @@ scatter( M(A(i,2),1), M(A(i,2),2), sz, c(i), 'filled' );
 
 %display('Vasquez cost')
 %timeCost2D(optimal_path, transl_spd, rot_spd, [x_start y_start 0])
-plot(optimal_path(:,1), optimal_path(:,2));
+plot(optimal_path(:,1), optimal_path(:,2), '-o');
 scatter(x_start, y_start, 25, 'filled');
 scatter(x_end, y_end, 25, 'filled');
 txt1 = ['cost = ', num2str(min_cost)];
@@ -190,7 +189,7 @@ title('Torres 16 Path');
 xlabel('East (x)');
 ylabel('North (y)');
 hold on;
-plot(FullPathTorres(:,1), FullPathTorres(:,2));
+plot(FullPathTorres(:,1), FullPathTorres(:,2), '-o');
 scatter(x_start, y_start, 25, 'filled');
 scatter(x_end, y_end, 25, 'filled');
 txt1 = ['cost = ', num2str(torres_cost)];

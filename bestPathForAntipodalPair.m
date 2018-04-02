@@ -25,8 +25,6 @@
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-
-
 % Best path for antipodal pairs
 % A: antipodal pairs
 % V: vertices of the polygon
@@ -90,7 +88,7 @@ function [Path, inclination] = bestPathForAntipodalPair(V, A, dx)
 %         scatter(PsR(c_vertex,1), PsR(c_vertex,2), 20, 'filled');
 %         title('Polygon rotated in best path');
 
-        [PathRotated, transl_dist] = getPathMR([PsR PeR], dx, 1);
+        [PathRotated] = getPathMR([PsR PeR], dx, 1);
 %         plot(PathRotated(:,1), PathRotated(:,2));
 %         hold off;
 %         pause;
@@ -127,7 +125,7 @@ function [Path, inclination] = bestPathForAntipodalPair(V, A, dx)
 %         title('Polygon rotated in best path inv');
 
 
-        [PathRotated, transl_dist] = getPathMR([PsR PeR], dx, -1);
+        [PathRotated] = getPathMR([PsR PeR], dx, -1);
 %         plot(PathRotated(:,1), PathRotated(:,2));
 %         hold off;
 %         pause;

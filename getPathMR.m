@@ -24,9 +24,8 @@
 % (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-function [Path, Dist] = getPathMR(M, dx, dir)
-% Returns a path for a given polygon 
+function [Path] = getPathMR(M, dx, dir)
+% Returns a path for a given CONVEX polygon 
 % This is for a multirotor UAV, namely it generates sharp corners
 % Parameters: 
 % M: plygon. M should be formed by:
@@ -40,15 +39,10 @@ function [Path, Dist] = getPathMR(M, dx, dir)
 % dir: direction of the initial flight line. 1: forth (abajo arriba), -1:
 % back (arriba abajo). Default dir = 1% 
 
-
-
-% Returns the waypoints and the distances
-% Dist = [lb lf ll lr];
-% Solo para poligonos convexos
-% BUG que pasa si hay mas de una intersección con la linea vertical % 
+% Returns only the waypoints
+% For computing distances use getPathMR2
 
 %% Generate lines
-
 gap_y = 1;
 
 % polygon limits
@@ -64,10 +58,6 @@ y2 = up_limit + gap_y;
 x1 = l_limit + dx/2;
 x2 = x1;
 
-df = 0;
-db = 0;
-dr = 0;
-dl = 0;
 %dir = 1;% 1: forth (abajo arriba), -1: back (arriba abajo)
 
 %% Show the intersection points.
@@ -84,8 +74,8 @@ dl = 0;
 
 i = 1; %numero de waypoints agregados
 lines = 0;
-nLinesF = 0;
-nLinesB = 0;
+%nLinesF = 0;
+%nLinesB = 0;
 enterWP = [0 0];
 exitWP = [0 0];
 lastWP = [0 0];
@@ -105,8 +95,8 @@ while(x1 < (r_limit + dx/2)) %% TEST WARNING!!! previous: while(x1 <= r_limit)
     if (n == 1)
         p1 = intersections(1,:);
         Path(i,:) = p1;
-        enterWP = p1;
-        i = i+1;
+        lastWP = p1;
+        i = i + 1;
     end
     
     % si hay dos intersecciones entonces tomamos las intersecciones como wp
@@ -122,7 +112,6 @@ while(x1 < (r_limit + dx/2)) %% TEST WARNING!!! previous: while(x1 <= r_limit)
             p2 = intersections(2,:);
         end
             
-            
         % las ordenamos de acuerdo a la dirección
         if (dir == 1) % direcciń hacia arriba
             
@@ -136,52 +125,29 @@ while(x1 < (r_limit + dx/2)) %% TEST WARNING!!! previous: while(x1 <= r_limit)
                 exitWP = p2;
             end
             
-            % si hay lineas previas entonces conectamos la linea previa con
-            % la nueva a través de curvas de dubins
+            % si hay lineas previas entonces ajustamos los nuevos waypoints con los waypoints the la linea previa
             if(lines > 1)
-                % agregar un punto para compensar la inclinación de la
-                % arista del poligono
                 dif = enterWP(1,2) - lastWP(1,2);
-                if(dif < 0) % agregar un punto a la izquierda
+                if(dif < 0) 
+                    % Si la diferencia es negativa entonces el último punto
+                    % está arriba del punto de entrada.
+                    % Entones reemplazar el último punto.
                     intermediateWP = [lastWP(1,1) enterWP(1,2)];
-                    Path(i,:) = intermediateWP;
-                    i = i+1;
-                    
-                    % TODO: integrar la energia gastada entre esos dos
-                    % puntos
-                    %[dubinsWP, dist] = getDubinsWaypoints(intermediateWP, enterWP, curve_radius, dx, -1);
-                    Path = [Path ;intermediateWP; enterWP];
-                    %i = i + size(dubinsWP,1);
-                    i = i + 2;
-                    dist = norm(intermediateWP-enterWP);
-                    dl = dl + dist;
-                else % agregar un punto a la derecha
+                    Path(i-1,:) = intermediateWP;
+                else
+                    % De lo contrario, mover el punto de entradada
                     intermediateWP = [enterWP(1,1) lastWP(1,2)];
-                    
-                    %[dubinsWP, dist] = getDubinsWaypoints(lastWP, intermediateWP, curve_radius, dx, -1);
-                    %Path = [Path ;dubinsWP];
-                    Path = [Path; lastWP; intermediateWP];
-                    %i = i + size(dubinsWP,1);
-                    i = i + 2;
-                    
-                    %Path(i,:) = intermediateWP;
-                    %i = i+1;
-                    
-                    dist = norm(lastWP-intermediateWP);
-                    dl = dl + dist;
+                    enterWP = intermediateWP;
                 end
             end
             
+            % Agregar puntos de la nueva linea
             Path(i,:) = enterWP;
             i = i+1;
             Path(i,:) = exitWP;
             i = i+1;
             
-            dist = norm(exitWP-enterWP);
-            df = df + dist;
-            nLinesF = nLinesF +1;
         else % dirección hacia abajo
-            
            %ordenar los waypoints
            if (p2(1,2)<p1(1,2)) 
                enterWP = p1;
@@ -192,47 +158,23 @@ while(x1 < (r_limit + dx/2)) %% TEST WARNING!!! previous: while(x1 <= r_limit)
            end
            
            if(lines > 1)
-                % agregar un punto para compensar
+                % Alinear el ultimo punto y el punto de entrada
                 dif = enterWP(1,2) - lastWP(1,2);
-                if(dif > 0) % agregar un punto a la izquierda
+                if(dif > 0) 
+                    % Modificar el ultimo punto
                     intermediateWP = [lastWP(1,1) enterWP(1,2)];
-                    
-                    %Path(i,:) = intermediateWP;
-                    %i = i+1;
-
-                    %[dubinsWP, dist] = getDubinsWaypoints(intermediateWP, enterWP, curve_radius, dx, 1);
-                    %Path = [Path ;dubinsWP];
-                    Path = [Path; intermediateWP; enterWP];
-                    %i = i + size(dubinsWP,1);
-                    i = i+2;
-                    
-                    dist = norm(intermediateWP-enterWP);
-                    dr = dr + dist;
-                else % agregar un punto a la derecha
+                    Path(i-1,:) = intermediateWP;
+                else
+                    % Modificar el punto de entrada
                     intermediateWP = [enterWP(1,1) lastWP(1,2)];
-                                                            
-                    
-                    %[dubinsWP, dist] = getDubinsWaypoints(lastWP, intermediateWP, curve_radius, dx, 1);
-                    %Path = [Path ;dubinsWP];
-                    Path = [Path; lastWP; intermediateWP];
-                    %i = i + size(dubinsWP,1);
-                    i = i+2;
-                    
-                    %Path(i,:) = intermediateWP;
-                    %i = i+1;
-                    dist = norm(lastWP-intermediateWP);
-                    dr = dr + dist;
+                    enterWP = intermediateWP;      
                 end
             end
-           
             Path(i,:) = enterWP;
             i = i+1;
             Path(i,:) = exitWP;
             i = i+1;
-            
-            dist = norm(exitWP-enterWP);
-            db = db + dist;
-            nLinesB = nLinesB +1 ;
+
         end
         
         dir = dir * -1;
@@ -284,53 +226,31 @@ while(x1 < (r_limit + dx/2)) %% TEST WARNING!!! previous: while(x1 <= r_limit)
                     exitWP = p2;
                 end
 
-                % si hay lineas previas entonces conectamos la linea previa con
-                % la nueva a través de curvas de dubins
+                % si hay lineas previas entonces ajustamos los nuevos waypoints con los waypoints the la linea previa
                 if(lines > 1)
-                    % agregar un punto para compensar la inclinación de la
-                    % arista del poligono
                     dif = enterWP(1,2) - lastWP(1,2);
-                    if(dif < 0) % agregar un punto a la izquierda
+                    if(dif < 0) 
+                        % Si la diferencia es negativa entonces el último punto
+                        % está arriba del punto de entrada.
+                        % Entones reemplazar el último punto.
                         intermediateWP = [lastWP(1,1) enterWP(1,2)];
-                        Path(i,:) = intermediateWP;
-                        i = i+1;
-
-                        % TODO: integrar la energia gastada entre esos dos
-                        % puntos
-                        %[dubinsWP, dist] = getDubinsWaypoints(intermediateWP, enterWP, curve_radius, dx, -1);
-                        Path = [Path ;intermediateWP; enterWP];
-                        %i = i + size(dubinsWP,1);
-                        i = i + 2;
-                        dist = norm(intermediateWP-enterWP);
-                        dl = dl + dist;
-                    else % agregar un punto a la derecha
+                        Path(i-1,:) = intermediateWP;
+                    else
+                        % De lo contrario, mover el punto de entradada
                         intermediateWP = [enterWP(1,1) lastWP(1,2)];
-
-                        %[dubinsWP, dist] = getDubinsWaypoints(lastWP, intermediateWP, curve_radius, dx, -1);
-                        %Path = [Path ;dubinsWP];
-                        Path = [Path; lastWP; intermediateWP];
-                        %i = i + size(dubinsWP,1);
-                        i = i + 2;
-
-                        %Path(i,:) = intermediateWP;
-                        %i = i+1;
-
-                        dist = norm(lastWP-intermediateWP);
-                        dl = dl + dist;
+                        enterWP = intermediateWP;
                     end
                 end
 
+                % Agregar puntos de la nueva linea
                 Path(i,:) = enterWP;
                 i = i+1;
                 Path(i,:) = exitWP;
                 i = i+1;
 
-                dist = norm(exitWP-enterWP);
-                df = df + dist;
-                nLinesF = nLinesF +1;
             else % dirección hacia abajo
 
-               %ordenar los waypoints
+               % ordenar los waypoints
                if (p2(1,2)<p1(1,2)) 
                    enterWP = p1;
                    exitWP = p2;
@@ -340,47 +260,23 @@ while(x1 < (r_limit + dx/2)) %% TEST WARNING!!! previous: while(x1 <= r_limit)
                end
 
                if(lines > 1)
-                    % agregar un punto para compensar
+                    % Alinear el ultimo punto y el punto de entrada
                     dif = enterWP(1,2) - lastWP(1,2);
-                    if(dif > 0) % agregar un punto a la izquierda
+                    if(dif > 0) 
+                        % Modificar el ultimo punto
                         intermediateWP = [lastWP(1,1) enterWP(1,2)];
-
-                        %Path(i,:) = intermediateWP;
-                        %i = i+1;
-
-                        %[dubinsWP, dist] = getDubinsWaypoints(intermediateWP, enterWP, curve_radius, dx, 1);
-                        %Path = [Path ;dubinsWP];
-                        Path = [Path; intermediateWP; enterWP];
-                        %i = i + size(dubinsWP,1);
-                        i = i+2;
-
-                        dist = norm(intermediateWP-enterWP);
-                        dr = dr + dist;
-                    else % agregar un punto a la derecha
+                        Path(i-1,:) = intermediateWP;
+                    else
+                        % Modificar el punto de entrada
                         intermediateWP = [enterWP(1,1) lastWP(1,2)];
-
-
-                        %[dubinsWP, dist] = getDubinsWaypoints(lastWP, intermediateWP, curve_radius, dx, 1);
-                        %Path = [Path ;dubinsWP];
-                        Path = [Path; lastWP; intermediateWP];
-                        %i = i + size(dubinsWP,1);
-                        i = i+2;
-
-                        %Path(i,:) = intermediateWP;
-                        %i = i+1;
-                        dist = norm(lastWP-intermediateWP);
-                        dr = dr + dist;
+                        enterWP = intermediateWP;      
                     end
                 end
-
                 Path(i,:) = enterWP;
                 i = i+1;
                 Path(i,:) = exitWP;
                 i = i+1;
 
-                dist = norm(exitWP-enterWP);
-                db = db + dist;
-                nLinesB = nLinesB +1 ;
             end
 
             dir = dir * -1;
@@ -388,8 +284,7 @@ while(x1 < (r_limit + dx/2)) %% TEST WARNING!!! previous: while(x1 <= r_limit)
         end
     end
     
-    
-    nLines = [nLinesB nLinesF];
+    %nLines = [nLinesB nLinesF];
     %pause
     
     x1 = x1 + dx;
@@ -398,7 +293,5 @@ end
 
 % title('Intersection Points');
 % hold off;
-
-Dist = [db df dl dr];
 
 end
