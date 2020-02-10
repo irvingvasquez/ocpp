@@ -8,13 +8,13 @@ Field surveying by drones has become a successful activity with applications to 
 Path example:
 ![Path Example](images/path_example.png)
 
-The algorithm as been coded on matlab. In addition, the Torres's algorithm has been also implemented for comparison purposed. The code was tested for the last time on MatLab2019b.
+The algorithm as been coded on matlab. In addition, the Torres's algorithm has been also implemented for comparison purposes. The code was tested for the last time on MatLab2019b.
 
-The planner was early published as a conference paper as:
+The planner was early published as a conference paper:
 
 > Vasquez-Gomez, J. I., Melchor, M. M., & Lozada, J. C. H. (2017, November). Optimal Coverage Path Planning Based on the Rotating Calipers Algorithm. In Mechatronics, Electronics and Automotive Engineering (ICMEAE), 2017 International Conference on (pp. 140-144). IEEE.
 
-Later, a deeper study of the algorithm was done in our Journal paper, where we call it as the rotating calipers path planner (RCPP):
+Later, a deeper study of the algorithm was done in our Journal paper, where we call it "the rotating calipers path planner" (RCPP):
 
 > Juan Irving Vasquez-Gomez, Magdalena Marciano-Melchor, Luis Valentin, Juan Carlos Herrera-Lozada, Coverage Path Planning for 2D Convex Regions. Journal of Intelligent & Robotic Systems. 2019
 
