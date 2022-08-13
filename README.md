@@ -20,8 +20,18 @@ Later, a deeper study of the algorithm was done in our Journal paper, where we c
 
 If you are using this code in an academic work, please cite our papers. Paper preprints are available in my [web page][jivg]. If your are using this code in a commercial application please let us know, keep track on our developments and their use help us to keep releasing code.
 
-Irving Vasquez, 2019
+Irving Vasquez, 
+
 [jivg.org][jivg]
 
+## Short Usage Tutorial
+
+### Polygons 
+
+The polygons are specified as a M x 2 matrix. Where M is the amount of vertices. Ranndom polygons cab ne created with the function getConvexPolygon. A polygon can also be read from a CSV file with *loadPolygonCSV* function.
+
+### Testing RCPP
+
+The easiest way is to read or create a plygon and call the CPP function. 
 
 [jivg]: https://jivg.org/
