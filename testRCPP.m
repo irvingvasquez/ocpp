@@ -4,13 +4,25 @@
 %% Section 1 Title
 % Description of first code block
 polygon_file = "C:\Users\vagop\projects\sweep_cpp\out\target_rcpp_room.txt";
-home_point_file = "C:\Users\vagop\projects\sweep_cpp\out\p_i_a_rcpp.txt";
-dx = 50;
-[poly, poly_s] = loadPolygonCSV(polygon_file);
-home_point = readmatrix(home_point_file);
-home_point
+starting_point_file = "C:\Users\vagop\projects\sweep_cpp\out\p_e_rcpp.txt";
+ending_point_file = "C:\Users\vagop\projects\sweep_cpp\out\p_x_rcpp.txt";
+dx = 20;
 
-[optimal_path] = RCPP(poly, dx, home_point, home_point, 1.0, 0.1)
+[poly, poly_s] = loadPolygonCSV(polygon_file);
+s_point = readmatrix(starting_point_file);
+e_point = readmatrix(ending_point_file);
+%home_point
+
+x_start = s_point(1);
+y_start = s_point(2);
+x_end = e_point(1);
+y_end = e_point(2);
+
+tic;
+[optimal_path, min_cost] = RCPP(poly, dx, s_point, e_point, 40.0, 0.7);
+RCPP_time = toc;
+RCPP_time
+
 
 %% Section 2 Title
 % Description of second code block
@@ -23,7 +35,7 @@ title('Vasquez');
 xlabel('East (x)');
 ylabel('North (y)');
 hold on;
-i = best_antipodal_pair;
+%i = best_antipodal_pair;
 %scatter( poly(A(i,1),1), poly(A(i,1),2), sz, c(i), 'filled' );
 %scatter( poly(A(i,2),1), poly(A(i,2),2), sz, c(i), 'filled' );
 %line([poly(A(i,1),1); poly(A(i,2),1)],[poly(A(i,1),2);poly(A(i,2),2)],'Color',[rand() rand() rand()],'LineStyle','--');
@@ -39,3 +51,6 @@ hold off;
 
 path_file = "C:\Users\vagop\projects\sweep_cpp\out\path.txt";
 writematrix(optimal_path, path_file);
+
+path_file = "C:\Users\vagop\projects\sweep_cpp\out\lenght.txt";
+writematrix(min_cost, path_file);

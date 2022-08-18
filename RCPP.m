@@ -1,6 +1,6 @@
 
 
-function [optimal_path] = RCPP(M, dx, starting_point, ending_point, translation_speed, rot_spd)
+function [optimal_path, min_cost] = RCPP(M, dx, starting_point, ending_point, translation_speed, rot_spd)
 % Rotating calipers path planner 
 % 
 % M : Polygon
