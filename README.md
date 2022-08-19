@@ -32,6 +32,6 @@ The polygons are specified as a M x 2 matrix. Where M is the amount of vertices.
 
 ### Testing RCPP
 
-The easiest way is to read or create a plygon and call the CPP function. 
+The easiest way is to read or create a polygon and call the RCPP function. See the testRCPP file.
 
 [jivg]: https://jivg.org/

@@ -3,9 +3,9 @@
 
 %% Section 1 Title
 % Description of first code block
-polygon_file = "C:\Users\vagop\projects\sweep_cpp\out\target_rcpp_room.txt";
-starting_point_file = "C:\Users\vagop\projects\sweep_cpp\out\p_e_rcpp.txt";
-ending_point_file = "C:\Users\vagop\projects\sweep_cpp\out\p_x_rcpp.txt";
+polygon_file = "data\target_rcpp_room.txt";
+starting_point_file = "data\p_e_rcpp.txt";
+ending_point_file = "data\p_x_rcpp.txt";
 dx = 20;
 
 [poly, poly_s] = loadPolygonCSV(polygon_file);
